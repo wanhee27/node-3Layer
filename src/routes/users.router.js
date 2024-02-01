@@ -48,12 +48,28 @@ router.post("/sign-in", async (req, res, next) => {
   if (!(await bcrypt.compare(password, user.password)))
     return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
 
-  //쿠키할당
-  const token = jwt.sign({ userId: user.userId }, "custom-secret-key");
+  //쿠키할당 만료시간 12시간
+  const token = jwt.sign({ userId: user.userId }, "custom-secret-key", { expiresIn: "12h" });
   res.cookie("authorization", `Bearer ${token}`);
 
   // 출력
   return res.status(200).json({ message: "로그인에 성공하였습니다." });
+});
+
+// 개인 정보 조회
+router.get("/users", authMiddleware, async (req, res, next) => {
+  const { userId } = req.user;
+  const user = await prisma.users.findFirst({
+    where: { userId: +userId },
+    select: {
+      userId: true,
+      email: true,
+      name: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+  return res.status(200).json({ data: user });
 });
 
 export default router;
