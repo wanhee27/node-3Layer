@@ -72,4 +72,6 @@ router.get("/users", authMiddleware, async (req, res, next) => {
   return res.status(200).json({ data: user });
 });
 
+// 개인 정보 수정
+
 export default router;
