@@ -46,6 +46,23 @@ router.get("/resumes", async (req, res, next) => {
   return res.status(200).json({ data: resume });
 });
 // 이력서 상세 조회 API
+// 이력서 ID, 이력서 제목, 자기소개, 작성자명, 이력서 상태, 작성 날짜 조회하기
+router.get("/resumes/:resumeId", async (req, res, next) => {
+  const { resumeId } = req.params;
+  const resume = await prisma.resumes.findFirst({
+    where: { resumeId: +resumeId },
+    select: {
+      resumeId: true,
+      userId: true,
+      title: true,
+      content: true,
+      user: { select: { name: true } },
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+  return res.status(200).json({ data: resume });
+});
 
 // 이력서 수정 API
 
