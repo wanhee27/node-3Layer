@@ -79,12 +79,11 @@ router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
   }
   if (userId !== resume.userId) {
     return res.status(401).json({ message: "이력서를 수정할 권한이 없습니다." });
-  }
-
-  await prisma.resumes.update({
-    data: { title, content, status },
-    where: { resumeId: +resumeId }
-  });
+  } else
+    await prisma.resumes.update({
+      data: { title, content, status },
+      where: { resumeId: +resumeId }
+    });
 
   return res.status(200).json({ message: "이력서 수정사항이 저장되었습니다." });
 });
