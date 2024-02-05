@@ -11,10 +11,10 @@ router.post("/resumes", authMiddleware, async (req, res, next) => {
     const { userId } = req.user;
 
     if (!title) {
-      return res.status(401).json({ message: "제목을 입력해주세요." });
+      return res.status(404).json({ message: "제목을 입력해주세요." }); // 404 - Not Found (찾을 수 없음)
     }
     if (!content) {
-      return res.status(401).json({ message: "내용을 입력해주세요" });
+      return res.status(404).json({ message: "내용을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
     }
     const resume = await prisma.resumes.create({
       data: {
