@@ -1,7 +1,7 @@
 import express from "express";
 import { prisma } from "../utils/index.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { generateToken } from "../utils/jwt.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -73,7 +73,7 @@ router.post("/sign-in", async (req, res, next) => {
       return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
 
     //쿠키할당 만료시간 12시간
-    const token = jwt.sign({ userId: user.userId }, process.env.TOKEN_SECRET_KEY, { expiresIn: "12h" });
+    const token = generateToken({ userId: user.userId });
     res.cookie("authorization", `Bearer ${token}`);
 
     // 출력

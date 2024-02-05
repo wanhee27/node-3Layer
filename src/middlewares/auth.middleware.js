@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../utils/jwt.js";
 import { prisma } from "../utils/index.js";
 
 export default async function (req, res, next) {
@@ -11,7 +11,7 @@ export default async function (req, res, next) {
     const [tokenType, token] = authorization.split(" ");
     if (tokenType !== "Bearer") throw new Error("토큰 타입이 Bearer 형식이 아닙니다.");
 
-    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY);
+    const decodedToken = verifyToken(token); // jwt.verfy 모듈화
     const userId = decodedToken.userId;
 
     const user = await prisma.users.findFirst({
@@ -27,4 +27,13 @@ export default async function (req, res, next) {
     if (error.name === "JsonWebTokenError") return res.status(401).json({ message: "토큰이 조작되었습니다." });
     return res.status(400).json({ message: error.message });
   }
+  // 똑같은 error message 이면서 아래와 같은 방식으로도 표현이 가능하다.
+  // switch (error.name) {
+  //   case 'TokenExpiredError':
+  //     return res.status(401).json({ message: '토큰이 만료되었습니다.' });
+  //   case 'JsonWebTokenError':
+  //     return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
+  //   default:
+  //     return res.status(400).json({ message: error.message });
+  // }
 }
