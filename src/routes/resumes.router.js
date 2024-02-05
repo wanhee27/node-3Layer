@@ -32,6 +32,16 @@ router.post("/resumes", authMiddleware, async (req, res, next) => {
 // 모든 이력서 목록 조회 API
 router.get("/resumes", async (req, res, next) => {
   try {
+    const orderKey = req.query.orderKey ?? "resumeId";
+    const orderValue = req.query.orderValue ?? "desc";
+
+    if (!["resumeId", "status"].includes(orderKey)) {
+      return res.status(400).json({ success: false, message: "orderKey가 올바르지 않습니다." }); // 400 - Bad Request (잘못된요청)
+    }
+    if (!["asc", "desc"].includes(orderValue.toLowerCase())) {
+      return res.status(400).json({ success: false, message: "orderValue가 올바르지 않습니다." }); // 400 - Bad Request (잘못된요청)
+    }
+
     const resume = await prisma.resumes.findMany({
       select: {
         resumeId: true,
@@ -43,10 +53,11 @@ router.get("/resumes", async (req, res, next) => {
         createdAt: true,
         updatedAt: true
       },
-      // QueryString 왜 사용하는지 모르겠음.
-      orderBy: {
-        createdAt: "desc"
-      }
+      orderBy: [
+        {
+          [orderKey]: orderValue
+        }
+      ]
     });
     return res.status(200).json({ data: resume });
   } catch (error) {
@@ -58,6 +69,9 @@ router.get("/resumes", async (req, res, next) => {
 router.get("/resumes/:resumeId", async (req, res, next) => {
   try {
     const { resumeId } = req.params;
+    if (!["resumeId"]) {
+      return res.status(400).json({ success: false, message: "resumeI는 필수값입니다." }); // 400 - Bad Request (잘못된요청)
+    }
     const resume = await prisma.resumes.findFirst({
       where: { resumeId: +resumeId },
       select: {
@@ -71,6 +85,9 @@ router.get("/resumes/:resumeId", async (req, res, next) => {
         updatedAt: true
       }
     });
+    if (!resume) {
+      return res.status(200).json({ data: {} });
+    }
     return res.status(200).json({ data: resume });
   } catch (error) {
     next(error);
