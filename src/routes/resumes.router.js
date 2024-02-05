@@ -147,11 +147,14 @@ router.delete("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
     const resume = await prisma.resumes.findFirst({
       where: { resumeId: +resumeId }
     });
+    if (!resumeId) {
+      return res.status(400).json({ success: false, message: "resumeI는 필수값입니다." }); // 400 - Bad Request (잘못된요청)
+    }
     if (!resume) {
-      return res.status(404).json({ message: "이력서 조회에 실패하였습니다." }); // 404 - Not Found (찾을 수 없음)
+      return res.status(404).json({ success: false, message: "이력서 조회에 실패하였습니다." }); // 404 - Not Found (찾을 수 없음)
     }
     if (userId !== resume.userId) {
-      return res.status(403).json({ message: "이력서를 수정할 권한이 없습니다." }); // 403 - Forbidden (금지됨)
+      return res.status(403).json({ success: false, message: "이력서를 수정할 권한이 없습니다." }); // 403 - Forbidden (금지됨)
     }
 
     await prisma.resumes.delete({
