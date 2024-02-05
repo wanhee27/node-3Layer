@@ -47,7 +47,7 @@ router.post("/sign-up", async (req, res, next) => {
     if (!name) {
       return res.status(400).json({ message: "이름을 입력해주세요" });
     }
-
+    // 데이터 출력
     return res.status(201).json({ email, name });
   } catch (error) {
     next(error);
@@ -58,7 +58,14 @@ router.post("/sign-up", async (req, res, next) => {
 router.post("/sign-in", async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
+    // 이메일 존재 유무
+    if (!email) {
+      return res.status(400).json({ message: "이메일을 입력해주세요" });
+    }
+    // 비밀번호 존재 유무
+    if (!password) {
+      return res.status(400).json({ message: "비밀번호를 입력해주세요" });
+    }
     const user = await prisma.users.findFirst({ where: { email } });
 
     if (!user) return res.status(401).json({ message: "존재하지 않는 이메일입니다." });
