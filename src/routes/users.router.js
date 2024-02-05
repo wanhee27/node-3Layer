@@ -97,6 +97,9 @@ router.get("/users", authMiddleware, async (req, res, next) => {
         updatedAt: true
       }
     });
+    if (!userId) {
+      return res.status(404).json({ message: "존재하지 않는 사용자입니다." }); // 404 - Not Found (찾을 수 없음)
+    }
     return res.status(200).json({ data: user });
   } catch (error) {
     next(error);
