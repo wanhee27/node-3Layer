@@ -88,10 +88,10 @@ router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
       where: { resumeId: +resumeId }
     });
     if (!resume) {
-      return res.status(404).json({ message: "이력서 조회에 실패하였습니다." });
+      return res.status(404).json({ message: "이력서 조회에 실패하였습니다." }); // 404 - Not Found (찾을 수 없음)
     }
     if (userId !== resume.userId) {
-      return res.status(401).json({ message: "이력서를 수정할 권한이 없습니다." });
+      return res.status(403).json({ message: "이력서를 수정할 권한이 없습니다." }); // 403 - Forbidden (금지됨)
     } else
       await prisma.resumes.update({
         data: { title, content, status },
@@ -114,10 +114,10 @@ router.delete("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
       where: { resumeId: +resumeId }
     });
     if (!resume) {
-      return res.status(404).json({ message: "이력서 조회에 실패하였습니다." });
+      return res.status(404).json({ message: "이력서 조회에 실패하였습니다." }); // 404 - Not Found (찾을 수 없음)
     }
     if (userId !== resume.userId) {
-      return res.status(401).json({ message: "이력서를 수정할 권한이 없습니다." });
+      return res.status(403).json({ message: "이력서를 수정할 권한이 없습니다." }); // 403 - Forbidden (금지됨)
     }
 
     await prisma.resumes.delete({

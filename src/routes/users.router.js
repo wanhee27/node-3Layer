@@ -16,23 +16,23 @@ router.post("/sign-up", async (req, res, next) => {
     });
     // 이메일 존재 유무
     if (!email) {
-      return res.status(400).json({ message: "이메일을 입력해주세요" });
+      return res.status(404).json({ message: "이메일을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
     }
     // 중복된 이메일
     if (isExisUser) {
-      return res.status(400).json({ message: "이미 존재하는 이메일입니다." });
+      return res.status(409).json({ message: "이미 존재하는 이메일입니다." }); // 409 - Conflict (충돌)
     }
     // 비밀번호 존재 유무
     if (!password) {
-      return res.status(400).json({ message: "비밀번호를 입력해주세요" });
+      return res.status(404).json({ message: "비밀번호를 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
     }
     // 비밀번호의 길이
     if (password.length < 6) {
-      return res.status(400).json({ message: "비밀번호는 최소 6자리 이상입니다." });
+      return res.status(400).json({ message: "비밀번호는 최소 6자리 이상입니다." }); // 400 - Bad Request (잘못된요청)
     }
     // 비밀번호 확인
     if (password !== password2) {
-      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
+      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." }); // 400 - Bad Request (잘못된요청)
     }
     // 비밀번호 복호화
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -45,7 +45,7 @@ router.post("/sign-up", async (req, res, next) => {
     });
     // 이름 존재 유무
     if (!name) {
-      return res.status(400).json({ message: "이름을 입력해주세요" });
+      return res.status(404).json({ message: "이름을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
     }
     // 데이터 출력
     return res.status(201).json({ email, name });
@@ -60,20 +60,20 @@ router.post("/sign-in", async (req, res, next) => {
     const { email, password } = req.body;
     // 이메일 존재 유무
     if (!email) {
-      return res.status(400).json({ message: "이메일을 입력해주세요" });
+      return res.status(404).json({ message: "이메일을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
     }
     // 비밀번호 존재 유무
     if (!password) {
-      return res.status(400).json({ message: "비밀번호를 입력해주세요" });
+      return res.status(404).json({ message: "비밀번호를 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
     }
     const user = await prisma.users.findFirst({ where: { email } });
 
-    if (!user) return res.status(401).json({ message: "존재하지 않는 이메일입니다." });
+    if (!user) return res.status(404).json({ message: "존재하지 않는 이메일입니다." }); // 404 - Not Found (찾을 수 없음)
     if (!(await bcrypt.compare(password, user.password)))
-      return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
+      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." }); // 400 - Bad Request (잘못된요청)
 
     //쿠키할당 만료시간 12시간
-    const token = generateToken({ userId: user.userId });
+    const token = generateToken({ userId: user.userId }); // jwt.sign 모듈화
     res.cookie("authorization", `Bearer ${token}`);
 
     // 출력
