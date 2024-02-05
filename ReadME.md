@@ -41,7 +41,8 @@
 - [`API명세서 바로가기`](https://www.notion.so/Resume-API-a4514d07551f4a4cac803a515770616d?pvs=4)
 
 # ERD URL
--  [ `ERD 바로가기` ](https://drawsql.app/teams/wani/diagrams/resume-hub) 
+-  [ `ERD 바로가기` ](https://drawsql.app/teams/wani/diagrams/resume-hub)
+-  [ `ERD 바로가기` ](https://www.erdcloud.com/d/d4PzQAsaFDiMWer42)
 
 
 # 더 고민해 보기
