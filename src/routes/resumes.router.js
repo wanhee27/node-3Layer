@@ -70,7 +70,7 @@ router.get("/resumes", async (req, res, next) => {
 router.get("/resumes/:resumeId", async (req, res, next) => {
   try {
     const { resumeId } = req.params;
-    if (!["resumeId"]) {
+    if (!resumeId) {
       return res.status(400).json({ success: false, message: "resumeI는 필수값입니다." }); // 400 - Bad Request (잘못된요청)
     }
     const resume = await prisma.resumes.findFirst({
@@ -110,12 +110,28 @@ router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
     }
     if (userId !== resume.userId) {
       return res.status(403).json({ message: "이력서를 수정할 권한이 없습니다." }); // 403 - Forbidden (금지됨)
-    } else
-      await prisma.resumes.update({
-        data: { title, content, status },
-        where: { resumeId: +resumeId }
-      });
+    }
+    if (!resumeId) {
+      return res.status(400).json({ success: false, message: "resumeI는 필수값입니다." }); // 400 - Bad Request (잘못된요청)
+    }
+    if (!title) {
+      return res.status(400).json({ success: false, message: "이력서 제목을 입력해주세요." }); // 400 - Bad Request (잘못된요청)
+    }
+    if (!content) {
+      return res.status(400).json({ success: false, message: "이력서를 작성해주세요." }); // 400 - Bad Request (잘못된요청)
+    }
+    if (!status) {
+      return res.status(400).json({ success: false, message: "상태값은 필수입니다." }); // 400 - Bad Request (잘못된요청)
+    }
+    // status 존재한다면
+    if (!["APPLY", "DROP", "PASS", "INTERVIEW1", "INTERVIEW2", "FINAL_PASS"].includes(status)) {
+      return res.status(400).json({ success: false, message: "올바르지 않은 상태값 입니다." }); // 400 - Bad Request (잘못된요청)
+    }
 
+    await prisma.resumes.update({
+      where: { resumeId: +resumeId },
+      data: { title, content, status }
+    });
     return res.status(200).json({ message: "이력서 수정사항이 저장되었습니다." });
   } catch (error) {
     next(error);
