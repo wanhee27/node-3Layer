@@ -1,5 +1,5 @@
 import express from "express";
-import { prisma } from "../utils/prisma/index.js";
+import { prisma } from "../utils/index.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -29,7 +29,7 @@ router.post("/resumes", authMiddleware, async (req, res, next) => {
   }
 });
 
-// 모든 이력서 조회 API
+// 모든 이력서 목록 조회 API
 router.get("/resumes", async (req, res, next) => {
   try {
     const resume = await prisma.resumes.findMany({

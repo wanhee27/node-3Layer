@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
-import { prisma } from "../utils/prisma/index.js";
+import { prisma } from "../utils/index.js";
 
 export default async function (req, res, next) {
   try {
-    // 쿠키를 토큰에 저장하고 검증하는과정 대신 세션사용으로 주석처리
+    // 쿠키에 토큰을 저장
     const { authorization } = req.cookies;
     if (!authorization) throw new Error("요청한 사용자의 토큰이 존재하지 않습니다.");
 
+    // 토큰 타입을 bearer 형식으로 변환
     const [tokenType, token] = authorization.split(" ");
     if (tokenType !== "Bearer") throw new Error("토큰 타입이 Bearer 형식이 아닙니다.");
 
