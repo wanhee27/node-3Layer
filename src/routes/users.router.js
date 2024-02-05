@@ -9,14 +9,22 @@ const router = express.Router();
 // 회원가입 API
 router.post("/sign-up", async (req, res, next) => {
   try {
-    // throw new Error("에러 핸들링 미들웨어 테스트 에러"); // 에러테스트
+    // throw new Error("에러 핸들링 미들웨어 테스트 에러"); // 에러테스트용
     const { email, password, password2, name } = req.body;
     const isExisUser = await prisma.users.findFirst({
       where: { email }
     });
+    // 이메일 존재 유무
+    if (!email) {
+      return res.status(400).json({ message: "이메일을 입력해주세요" });
+    }
     // 중복된 이메일
     if (isExisUser) {
-      return res.status(409).json({ message: "이미 존재하는 이메일입니다." });
+      return res.status(400).json({ message: "이미 존재하는 이메일입니다." });
+    }
+    // 비밀번호 존재 유무
+    if (!password) {
+      return res.status(400).json({ message: "비밀번호를 입력해주세요" });
     }
     // 비밀번호의 길이
     if (password.length < 6) {
@@ -24,7 +32,7 @@ router.post("/sign-up", async (req, res, next) => {
     }
     // 비밀번호 확인
     if (password !== password2) {
-      return res.status(409).json({ message: "비밀번호가 일치하지 않습니다." });
+      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
     }
     // 비밀번호 복호화
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,6 +43,10 @@ router.post("/sign-up", async (req, res, next) => {
         name
       }
     });
+    // 이름 존재 유무
+    if (!name) {
+      return res.status(400).json({ message: "이름을 입력해주세요" });
+    }
 
     return res.status(201).json({ email, name });
   } catch (error) {
