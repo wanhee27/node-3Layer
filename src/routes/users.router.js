@@ -10,43 +10,65 @@ const router = express.Router();
 router.post("/sign-up", async (req, res, next) => {
   try {
     // throw new Error("에러 핸들링 미들웨어 테스트 에러"); // 에러테스트용
-    const { email, password, password2, name } = req.body;
-    const isExisUser = await prisma.users.findFirst({
-      where: { email }
-    });
-    // 이메일 존재 유무
-    if (!email) {
-      return res.status(404).json({ message: "이메일을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
-    }
-    // 중복된 이메일
-    if (isExisUser) {
-      return res.status(409).json({ message: "이미 존재하는 이메일입니다." }); // 409 - Conflict (충돌)
-    }
-    // 비밀번호 존재 유무
-    if (!password) {
-      return res.status(404).json({ message: "비밀번호를 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
-    }
-    // 비밀번호의 길이
-    if (password.length < 6) {
-      return res.status(400).json({ message: "비밀번호는 최소 6자리 이상입니다." }); // 400 - Bad Request (잘못된요청)
-    }
-    // 비밀번호 확인
-    if (password !== password2) {
-      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." }); // 400 - Bad Request (잘못된요청)
-    }
-    // 비밀번호 복호화
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.users.create({
-      data: {
-        email,
-        password: hashedPassword, // 암호화된 비밀번호를 저장합니다.
-        name
+    const { clientId, email, password, password2, name } = req.body;
+    if (!clientId) {
+      // 이메일 존재 유무
+      if (!email) {
+        return res.status(404).json({ message: "이메일을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
       }
-    });
+      // 비밀번호 존재 유무
+      if (!password) {
+        return res.status(404).json({ message: "비밀번호를 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
+      }
+      // 비밀번호의 길이
+      if (password.length < 6) {
+        return res.status(400).json({ message: "비밀번호는 최소 6자리 이상입니다." }); // 400 - Bad Request (잘못된요청)
+      }
+      // 비밀번호 확인
+      if (password !== password2) {
+        return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." }); // 400 - Bad Request (잘못된요청)
+      }
+    }
+
     // 이름 존재 유무
     if (!name) {
       return res.status(404).json({ message: "이름을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
     }
+    // CLIENT
+    if (clientId) {
+      const isExisUser = await prisma.users.findFirst({
+        where: { clientId }
+      });
+      // 가입 여부
+      if (isExisUser) {
+        return res.status(400).json({ success: false, message: "이미 가입된 사용자입니다." });
+      }
+      const user = await prisma.users.create({
+        data: {
+          clientId,
+          name
+        }
+      });
+    } else {
+      // EMAIL
+      const isExisUser = await prisma.users.findFirst({
+        where: { email }
+      });
+      // 가입 여부
+      if (isExisUser) {
+        return res.status(400).json({ success: false, message: "이미 가입된 이메일입니다." });
+      }
+      // 비밀번호 복호화
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await prisma.users.create({
+        data: {
+          email,
+          password: hashedPassword, // 암호화된 비밀번호를 저장합니다.
+          name
+        }
+      });
+    }
+
     // 데이터 출력
     return res.status(201).json({ email, name });
   } catch (error) {
@@ -57,20 +79,30 @@ router.post("/sign-up", async (req, res, next) => {
 // 로그인 API
 router.post("/sign-in", async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    // 이메일 존재 유무
-    if (!email) {
-      return res.status(404).json({ message: "이메일을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
-    }
-    // 비밀번호 존재 유무
-    if (!password) {
-      return res.status(404).json({ message: "비밀번호를 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
-    }
-    const user = await prisma.users.findFirst({ where: { email } });
+    const { clientId, email, password } = req.body;
+    let user;
+    if (clientId) {
+      user = await prisma.users.findFirst({
+        where: {
+          clientId
+        }
+      });
+      if (!user) return res.status(404).json({ message: "존재하지 않는 아이디입니다." }); // 404 - Not Found (찾을 수 없음)
+    } else {
+      // 이메일 존재 유무
+      if (!email) {
+        return res.status(404).json({ message: "이메일을 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
+      }
+      // 비밀번호 존재 유무
+      if (!password) {
+        return res.status(404).json({ message: "비밀번호를 입력해주세요" }); // 404 - Not Found (찾을 수 없음)
+      }
+      user = await prisma.users.findFirst({ where: { email } });
 
-    if (!user) return res.status(404).json({ message: "존재하지 않는 이메일입니다." }); // 404 - Not Found (찾을 수 없음)
-    if (!(await bcrypt.compare(password, user.password)))
-      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." }); // 400 - Bad Request (잘못된요청)
+      if (!user) return res.status(404).json({ message: "존재하지 않는 이메일입니다." }); // 404 - Not Found (찾을 수 없음)
+      if (!(await bcrypt.compare(password, user.password)))
+        return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." }); // 400 - Bad Request (잘못된요청)
+    }
 
     //쿠키할당 만료시간 12시간
     const token = generateToken({ userId: user.userId }); // jwt.sign 모듈화
