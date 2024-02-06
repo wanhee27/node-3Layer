@@ -1,7 +1,7 @@
 import express from "express";
 import { prisma } from "../utils/index.js";
 import bcrypt from "bcrypt";
-import { generateToken } from "../utils/jwt.js";
+import { generateToken, generateRefreshToken } from "../utils/jwt.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -111,7 +111,10 @@ router.post("/sign-in", async (req, res, next) => {
 
     //쿠키할당 만료시간 12시간
     const token = generateToken({ userId: user.userId }); // jwt.sign 모듈화
+    const refreshToken = generateRefreshToken({ userId: user.userId });
+
     res.cookie("authorization", `Bearer ${token}`);
+    res.cookie("refreshToken", `Bearer ${refreshToken}`);
 
     // 출력
     return res.status(200).json({ message: "로그인에 성공하였습니다." });
