@@ -6,6 +6,8 @@ import AuthRouter from "./src/routes/auth.router.js";
 import LogMiddleware from "./src/middlewares/log.middleware.js";
 import ErrorHandlingMiddleware from "./src/middlewares/error-handling.middleware.js";
 import dotenv from "dotenv";
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
 
 dotenv.config();
 
