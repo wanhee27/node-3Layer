@@ -10,7 +10,10 @@ const router = express.Router();
 router.post("/sign-up", async (req, res, next) => {
   try {
     // throw new Error("에러 핸들링 미들웨어 테스트 에러"); // 에러테스트용
-    const { clientId, email, password, password2, name } = req.body;
+    const { clientId, email, password, password2, name, grade } = req.body;
+    if (grade && !["user", "admin"].includes(grade)) {
+      return res.status(400).json({ success: false, message: "권한 설정이 올바르지 않습니다." });
+    }
     if (!clientId) {
       // 이메일 존재 유무
       if (!email) {
@@ -46,7 +49,8 @@ router.post("/sign-up", async (req, res, next) => {
       const user = await prisma.users.create({
         data: {
           clientId,
-          name
+          name,
+          grade
         }
       });
     } else {
@@ -64,7 +68,8 @@ router.post("/sign-up", async (req, res, next) => {
         data: {
           email,
           password: hashedPassword, // 암호화된 비밀번호를 저장합니다.
-          name
+          name,
+          grade
         }
       });
     }
