@@ -99,7 +99,7 @@ router.get("/resumes/:resumeId", async (req, res, next) => {
 router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
   try {
     const { resumeId } = req.params;
-    const { userId } = req.user;
+    const { userId, grade } = req.user;
     const { title, content, status } = req.body;
 
     const resume = await prisma.resumes.findFirst({
@@ -108,11 +108,12 @@ router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
     if (!resume) {
       return res.status(404).json({ message: "이력서 조회에 실패하였습니다." }); // 404 - Not Found (찾을 수 없음)
     }
-    if (userId !== resume.userId) {
+    // 내가 작성한 이력서이거나 admin일 경우 지나간다.
+    if (grade === "user" && userId !== resume.userId) {
       return res.status(403).json({ message: "이력서를 수정할 권한이 없습니다." }); // 403 - Forbidden (금지됨)
     }
     if (!resumeId) {
-      return res.status(400).json({ success: false, message: "resumeI는 필수값입니다." }); // 400 - Bad Request (잘못된요청)
+      return res.status(400).json({ success: false, message: "resumeId는 필수값입니다." }); // 400 - Bad Request (잘못된요청)
     }
     if (!title) {
       return res.status(400).json({ success: false, message: "이력서 제목을 입력해주세요." }); // 400 - Bad Request (잘못된요청)
