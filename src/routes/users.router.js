@@ -199,7 +199,7 @@ router.get("/users", authMiddleware, async (req, res, next) => {
  *                 type: string
  *                 description: 회원 등급 (기본값 user, 인사담당자 admin)
  *                 example: 'user'
- *                 required: true
+ *                 required: false
  *     responses:
  *       201:
  *         description: 회원가입 성공

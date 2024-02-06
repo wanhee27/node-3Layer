@@ -168,4 +168,163 @@ router.delete("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
   }
 });
 
+//NOTE - Swagger 추가
+
+/**
+ * @swagger
+ * tags:
+ *   name: Resumes
+ *   description: 이력서 관련 API
+ */
+
+/**
+ * @swagger
+ * /api/resumes:
+ *   post:
+ *     summary: 이력서 생성
+ *     tags: [Resumes]
+ *     description: 새로운 이력서를 생성하는 API
+ *     requestBody:
+ *       description: 이력서 생성 요청 body data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: 이력서 제목
+ *                 example: 이력서 제목 예시
+ *               content:
+ *                 type: string
+ *                 description: 이력서 내용
+ *                 example: 이력서 내용 예시
+ *     responses:
+ *       201:
+ *         description: 이력서 생성 성공
+ *       400:
+ *         description: 잘못된 요청 또는 필수 필드 누락
+ *       403:
+ *         description: 권한이 없음
+ */
+
+/**
+ * @swagger
+ * /api/resumes:
+ *   get:
+ *     summary: 모든 이력서 목록 조회
+ *     tags: [Resumes]
+ *     description: 모든 이력서 목록을 조회하는 API
+ *     parameters:
+ *       - in: query
+ *         name: orderKey
+ *         schema:
+ *           type: string
+ *         description: 정렬 기준 필드 (resumeId 또는 status) 기본 resumeID
+ *       - in: query
+ *         name: orderValue
+ *         schema:
+ *           type: string
+ *         description: 정렬 방식 (asc 또는 desc) 기본 desc
+ *     responses:
+ *       200:
+ *         description: 모든 이력서 목록 조회 성공
+ *       400:
+ *         description: 잘못된 요청 또는 올바르지 않은 정렬 기준 또는 방식
+ */
+
+/**
+ * @swagger
+ * /api/resumes/{resumeId}:
+ *   get:
+ *     summary: 특정 이력서 조회
+ *     tags: [Resumes]
+ *     description: 특정 이력서를 조회하는 API
+ *     parameters:
+ *       - in: path
+ *         name: resumeId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: 조회할 이력서의 ID
+ *     responses:
+ *       200:
+ *         description: 이력서 조회 성공
+ *       400:
+ *         description: 잘못된 요청 또는 필수 필드 누락
+ *       404:
+ *         description: 이력서가 없음
+ */
+
+/**
+ * @swagger
+ * /api/resumes/{resumeId}:
+ *   patch:
+ *     summary: 이력서 수정
+ *     tags: [Resumes]
+ *     description: 특정 이력서를 수정하는 API
+ *     parameters:
+ *       - in: path
+ *         name: resumeId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: 수정할 이력서의 ID
+ *     requestBody:
+ *       description: 이력서 수정 요청 body data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: 이력서 제목
+ *                 example: 수정된 이력서 제목
+ *               content:
+ *                 type: string
+ *                 description: 이력서 내용
+ *                 example: 수정된 이력서 내용
+ *               status:
+ *                 type: string
+ *                 description: 이력서 상태
+ *                 example: PASS
+ *     responses:
+ *       200:
+ *         description: 이력서 수정 성공
+ *       400:
+ *         description: 잘못된 요청 또는 필수 필드 누락
+ *       403:
+ *         description: 권한이 없음
+ *       404:
+ *         description: 이력서가 없음
+ */
+
+/**
+ * @swagger
+ * /api/resumes/{resumeId}:
+ *   delete:
+ *     summary: 이력서 삭제
+ *     tags: [Resumes]
+ *     description: 특정 이력서를 삭제하는 API
+ *     parameters:
+ *       - in: path
+ *         name: resumeId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: 삭제할 이력서의 ID
+ *     responses:
+ *       200:
+ *         description: 이력서 삭제 성공
+ *       400:
+ *         description: 잘못된 요청 또는 필수 필드 누락
+ *       403:
+ *         description: 권한이 없음
+ *       404:
+ *         description: 이력서가 없음
+ */
+
 export default router;
