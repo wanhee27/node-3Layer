@@ -146,6 +146,129 @@ router.get("/users", authMiddleware, async (req, res, next) => {
   }
 });
 
-// 개인 정보 수정
+//NOTE - Swagger 추가
 
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: 사용자 관련 API
+ */
+
+/**
+ * @swagger
+ * /api/sign-up:
+ *   post:
+ *     summary: 사용자 회원가입
+ *     tags: [Users]
+ *     description: 카카오 로그인이나 이메일/패스워드를 통해 회원가입을 시도하는 API
+ *     requestBody:
+ *       description: 회원가입 요청 body data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: 이메일
+ *                 example: A1@com
+ *                 required: false
+ *               clientId:
+ *                 type: string
+ *                 description: 카카오 로그인했을 경우 카카오 클라이언트 아이디
+ *                 example: 'fjdsklafj280932'
+ *                 required: false
+ *               password:
+ *                 type: string
+ *                 description: 이메일 로그인일 경우 비밀번호
+ *                 example: aaaa1111
+ *                 required: false
+ *               password2:
+ *                 type: string
+ *                 description: 이메일 로그인일 경우 확인 비밀번호
+ *                 example: aaaa1111
+ *                 required: false
+ *               name:
+ *                 type: string
+ *                 description: 이름
+ *                 example: username
+ *                 required: true
+ *               grade:
+ *                 type: string
+ *                 description: 회원 등급 (기본값 user, 인사담당자 admin)
+ *                 example: 'user'
+ *                 required: true
+ *     responses:
+ *       201:
+ *         description: 회원가입 성공
+ *       400:
+ *         description: 잘못된 요청 또는 권한 설정 오류
+ *       404:
+ *         description: 요청에 필요한 정보가 부족함
+ */
+
+/**
+ * @swagger
+ * /api/sign-in:
+ *   post:
+ *     summary: 사용자 로그인
+ *     tags: [Users]
+ *     description: 카카오 로그인이나 이메일/패스워드를 통해 로그인을 시도하는 API
+ *     requestBody:
+ *       description: 로그인 요청 body data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             oneOf:
+ *               - required:
+ *                   - clientId
+ *               - required:
+ *                   - email
+ *                   - password
+ *             properties:
+ *               clientId:
+ *                 type: string
+ *                 description: 카카오 로그인했을 경우 카카오 클라이언트 아이디
+ *                 example: 'fjdsklafj280932'
+ *                 required: false
+ *               email:
+ *                 type: string
+ *                 description: 이메일
+ *                 example: A1@com
+ *                 required: false
+ *               password:
+ *                 type: string
+ *                 description: 이메일 로그인일 경우 비밀번호
+ *                 example: aaaa1111
+ *                 required: false
+ *     responses:
+ *       200:
+ *         description: 로그인 성공
+ *       400:
+ *         description: 잘못된 요청 또는 비밀번호 불일치
+ *       404:
+ *         description: 사용자 정보가 없음
+ */
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: 개인 정보 조회
+ *     tags: [Users]
+ *     description: 현재 로그인한 ID에 대한 상세 정보 API
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 성공적으로 개인 정보 조회
+ *       404:
+ *         description: 사용자 정보가 없음
+ *       401:
+ *         description: 인증 오류
+ */
 export default router;
