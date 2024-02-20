@@ -7,18 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model  Users {
+model Users {
   userId    Int      @id @default(autoincrement()) @map("userId")
   name      String   @map("name")
-  clientId  String?  @map("clientId")
   email     String?  @unique @map("email")
   password  String?  @map("password")
-  grade     Grade    @default(UNVERIFIED)@map("grade")
+  grade     Grade    @map("grade")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
-  resumes   Resumes[] // 사용자(Users) 테이블과 이력서(Resumes) 테이블이 1:N 관계를 맺습니다.
-  
+  resumes Resumes[]
+
   @@map("Users")
 }
 
@@ -28,18 +27,25 @@ enum Grade {
   ADMIN
 }
 
-
 model Resumes {
   resumeId  Int      @id @default(autoincrement()) @map("resumeId")
-  userId    Int      @map("userId")
+  userId    Int?     @map("userId")
   title     String   @map("title")
   content   String   @map("content") @db.Text
-  status    String   @default("APPLY") @map("status")
+  status    String   @map("status")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
-  // Users 테이블과 관계를 설정합니다.
-  user     Users      @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  
+  user Users? @relation(fields: [userId], references: [userId], onDelete: SetNull)
+
   @@map("Resumes")
+}
+
+enum status {
+  APPLY
+  DROP
+  PASS
+  INTERVIEW1
+  INTERVIEW2
+  FINAL_PASS
 }
