@@ -18,7 +18,7 @@ router.get("/verify-email/:token", async (req, res, next) => {
         userId: decodedToken.userId
       },
       data: {
-        grade: "user"
+        grade: "USER"
       }
     });
 

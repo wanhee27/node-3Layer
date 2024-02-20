@@ -15,7 +15,7 @@ export default async function (req, res, next) {
     const userId = decodedToken.userId;
 
     const user = await prisma.users.findFirst({
-      where: { userId: +userId }
+      where: { userId: +userId },
     });
     if (!user) throw new Error("토큰 사용자가 존재하지 않습니다.");
 

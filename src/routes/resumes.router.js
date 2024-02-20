@@ -149,7 +149,7 @@ router.delete("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
       where: { resumeId: +resumeId }
     });
     if (!resumeId) {
-      return res.status(400).json({ success: false, message: "resumeI는 필수값입니다." }); // 400 - Bad Request (잘못된요청)
+      return res.status(400).json({ success: false, message: "resumeId는 필수값입니다." }); // 400 - Bad Request (잘못된요청)
     }
     if (!resume) {
       return res.status(404).json({ success: false, message: "이력서 조회에 실패하였습니다." }); // 404 - Not Found (찾을 수 없음)
