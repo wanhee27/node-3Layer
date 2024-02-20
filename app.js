@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import UsersRouter from "./src/routes/users.router.js";
 import ResumeRouter from "./src/routes/resumes.router.js";
 import AuthRouter from "./src/routes/auth.router.js";
+import EmailRouter from "./src/routes/email.router.js";
 import LogMiddleware from "./src/middlewares/log.middleware.js";
 import ErrorHandlingMiddleware from "./src/middlewares/error-handling.middleware.js";
 import dotenv from "dotenv";
@@ -12,7 +13,7 @@ import swaggerJsdoc from "swagger-jsdoc";
 dotenv.config();
 
 const app = express();
-const PORT = 3019;
+const PORT = 3000;
 
 // Swagger 정의 옵션 설정
 const options = {
@@ -37,7 +38,7 @@ app.use(LogMiddleware);
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api", [UsersRouter, ResumeRouter /*AuthRouter*/]);
+app.use("/api", [UsersRouter, ResumeRouter, AuthRouter, EmailRouter]);
 app.use(ErrorHandlingMiddleware);
 
 app.listen(PORT, () => {

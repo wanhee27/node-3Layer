@@ -1,8 +1,9 @@
 import express from "express";
 import { prisma } from "../utils/index.js";
 import bcrypt from "bcrypt";
-import { generateToken, generateRefreshToken } from "../utils/jwt.js";
+import { generateToken, generateRefreshToken, generateEmailToken } from "../utils/jwt.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
+import { sendMail } from "../utils/email.js";
 
 const router = express.Router();
 
@@ -11,7 +12,8 @@ router.post("/sign-up", async (req, res, next) => {
   try {
     // throw new Error("에러 핸들링 미들웨어 테스트 에러"); // 에러테스트용
     const { clientId, email, password, password2, name, grade } = req.body;
-    if (grade && !["user", "admin"].includes(grade)) {
+    let user;
+    if (grade && !["USER", "ADMIN"].includes(grade)) {
       return res.status(400).json({ success: false, message: "권한 설정이 올바르지 않습니다." });
     }
     if (!clientId) {
@@ -46,7 +48,7 @@ router.post("/sign-up", async (req, res, next) => {
       if (isExisUser) {
         return res.status(400).json({ success: false, message: "이미 가입된 사용자입니다." });
       }
-      const user = await prisma.users.create({
+      user = await prisma.users.create({
         data: {
           clientId,
           name,
@@ -64,7 +66,7 @@ router.post("/sign-up", async (req, res, next) => {
       }
       // 비밀번호 복호화
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await prisma.users.create({
+      user = await prisma.users.create({
         data: {
           email,
           password: hashedPassword, // 암호화된 비밀번호를 저장합니다.
@@ -73,6 +75,10 @@ router.post("/sign-up", async (req, res, next) => {
         }
       });
     }
+    // 이메일 인증 토큰
+    const emailToken = generateEmailToken(user.userId, user.email);
+    // 이메일 발송
+    await sendMail(email, emailToken);
 
     // 데이터 출력
     return res.status(201).json({ email, name });
@@ -107,6 +113,9 @@ router.post("/sign-in", async (req, res, next) => {
       if (!user) return res.status(404).json({ message: "존재하지 않는 이메일입니다." }); // 404 - Not Found (찾을 수 없음)
       if (!(await bcrypt.compare(password, user.password)))
         return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." }); // 400 - Bad Request (잘못된요청)
+      if (user.grade === "UNVERIFIED") {
+        return res.status(403).json({ message: "이메일 인증이 필요합니다." });
+      }
     }
 
     //쿠키할당 만료시간 12시간
@@ -141,6 +150,39 @@ router.get("/users", authMiddleware, async (req, res, next) => {
       return res.status(404).json({ message: "존재하지 않는 사용자입니다." }); // 404 - Not Found (찾을 수 없음)
     }
     return res.status(200).json({ data: user });
+  } catch (error) {
+    next(error);
+  }
+});
+// 로그아웃 API
+router.post("/logout", async (req, res, next) => {
+  try {
+    // 쿠키를 삭제하여 로그아웃
+    res.clearCookie("authorization");
+    // res.clearCookie("refreshToken");
+
+    return res.status(200).json({ message: "로그아웃 되었습니다." });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 회원 탈퇴 API
+router.post("/sign-out", authMiddleware, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+
+    // 사용자 삭제
+    await prisma.users.delete({
+      where: {
+        userId: +userId
+      }
+    });
+
+    // 쿠키를 삭제하여 로그아웃
+    res.clearCookie("authorization");
+
+    return res.status(200).json({ message: "회원 탈퇴가 완료되었습니다." });
   } catch (error) {
     next(error);
   }

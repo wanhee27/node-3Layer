@@ -16,4 +16,20 @@ const verifyRefreshToken = (token) => {
   return jwt.verify(token, process.env.REFRESH_TOKEN_KEY);
 };
 
-export { generateToken, verifyToken, generateRefreshToken, verifyRefreshToken };
+const generateEmailToken = (userId, email) => {
+  const payload = {
+    userId: userId,
+    email: email
+  };
+
+  // 이메일 인증 토큰 생성
+  const token = jwt.sign(payload, process.env.EMAIL_VERIFY_TOKEN_KEY, { expiresIn: "24h" });
+
+  return token;
+};
+
+const verifyEmailToken = (token) => {
+  return jwt.verify(token, process.env.EMAIL_VERIFY_TOKEN_KEY);
+};
+
+export { generateToken, verifyToken, generateRefreshToken, verifyRefreshToken, generateEmailToken, verifyEmailToken };
