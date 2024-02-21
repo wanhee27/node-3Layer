@@ -6,7 +6,7 @@
 - [ ] 본인이 작성한 숙련 주차 과제 코드를 복사해서 심화 주차 과제를 위한 저장소를 생성합니다.
 - [ ] 숙련주차에서 작성한 코드를 3-Layered Architecture를 적용해서 구조를 변경합니다.
 - [ ] Controller, Service, Repository Layer는 Class를 이용해 구현합니다.
-- [ ] Controller, Service, Repository 의 Class 에 *Jest** 를 사용한 테스트 코드를 작성합니다.
+- [ ] Controller, Service, Repository 의 Class 에 **Jest** 를 사용한 테스트 코드를 작성합니다.
 
 <br>
 

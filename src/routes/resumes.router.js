@@ -42,7 +42,7 @@ router.get("/resumes", async (req, res, next) => {
     if (!["asc", "desc"].includes(orderValue.toLowerCase())) {
       return res.status(400).json({ success: false, message: "orderValue가 올바르지 않습니다." });
     }
-  
+
     const resume = await prisma.resumes.findMany({
       select: {
         resumeId: true,
@@ -60,7 +60,7 @@ router.get("/resumes", async (req, res, next) => {
         },
       ],
     });
-    
+
     return res.status(200).json({ data: resume });
   } catch (error) {
     next(error);
@@ -88,8 +88,7 @@ router.get("/resumes/:resumeId", async (req, res, next) => {
       },
     });
     if (!resume) {
-      return res.status(200).json({success: false,
-        message: "이력서가 존재하지 않습니다.", });
+      return res.status(200).json({ success: false, message: "이력서가 존재하지 않습니다." });
     }
     return res.status(200).json({ data: resume });
   } catch (error) {
