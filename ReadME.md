@@ -32,6 +32,7 @@
   - EMAIL_VERIFY_TOKEN_KEY 
   - SMTP_ID_KEY 
   - SMTP_PW_KEY
+  - SENDMAIL_URL
 ---
   <br>
   
@@ -79,7 +80,7 @@
 
 ### 개발
 
-- [ ]  rotues 에 있던 모든 코드가 3-Layered Architecture 로 분리되었나요?
+- [x]  rotues 에 있던 모든 코드가 3-Layered Architecture 로 분리되었나요?
 - [x]  Class 로 개발되었나요?
 - [ ]  Prisma 를 TypeORM 으로 변경하셨나요?
 - [ ]  모든 Layer에 Test Case 는 모두 작성하셨나요?
