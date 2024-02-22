@@ -13,7 +13,7 @@ const sendMail = async (email, emailToken) => {
     from: "wh@wh.com",
     to: email,
     subject: "이메일 인증을 완료해주세요",
-    text: `인증을 완료하려면 다음 링크를 클릭하세요: http://13.124.211.71:3000/verify-email/${emailToken}`,
+    text: `인증을 완료하려면 다음 링크를 클릭하세요: ${process.env.SENDMAIL_URL}/verify-email/${emailToken}`,
   };
 
   await transporter.sendMail(mailOptions);
